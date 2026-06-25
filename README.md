@@ -63,20 +63,18 @@ export default defineConfig({
         outDir: 'webroot/dist',
     },
     plugins: [
-        vitePhp({
-            inputs: [
-                {
-                    name: 'app',
-                    outDir: 'webroot/dist',
-                    publicPath: '/dist',
-                    inputs: {
-                        home:    'resources/pages/home.ts',
-                        product: 'resources/pages/product.ts',
-                        styles:  'resources/css/global.css',
-                    },
+        vitePhp([
+            {
+                name: 'app',
+                outDir: 'webroot/dist',
+                publicPath: '/dist',
+                inputs: {
+                    home:    'resources/pages/home.ts',
+                    product: 'resources/pages/product.ts',
+                    styles:  'resources/css/global.css',
                 },
-            ],
-        }),
+            },
+        ]),
     ],
 });
 ```
@@ -115,11 +113,7 @@ Both methods return an empty string when the manifest file is absent (no dev ser
 
 ### Vite plugin options
 
-`vitePhp(options)` accepts a single options object.
-
-| Option | Type | Required | Description |
-|---|---|---|---|
-| `inputs` | `BuildGroup[]` | yes | One group per build target (see below). |
+`vitePhp(inputs: BuildGroup[])` accepts an array of build groups.
 
 #### `BuildGroup`
 
@@ -150,31 +144,29 @@ Each entry in `inputs` can be written in two ways:
 #### Multiple groups example
 
 ```js
-vitePhp({
-    inputs: [
-        {
-            // ESM group: shared vendor chunk, tree-shaken per page.
-            name: 'app',
-            outDir: 'webroot/dist',
-            publicPath: '/dist',
-            inputs: {
-                home:    'resources/pages/home.ts',
-                product: { js: 'resources/pages/product.ts', css: 'resources/pages/product.css' },
-                styles:  'resources/css/global.css',
-            },
+vitePhp([
+    {
+        // ESM group: shared vendor chunk, tree-shaken per page.
+        name: 'app',
+        outDir: 'webroot/dist',
+        publicPath: '/dist',
+        inputs: {
+            home:    'resources/pages/home.ts',
+            product: { js: 'resources/pages/product.ts', css: 'resources/pages/product.css' },
+            styles:  'resources/css/global.css',
         },
-        {
-            // IIFE group: self-contained, no shared chunks, works under file://.
-            name: 'embed',
-            format: 'iife',
-            outDir: 'webroot/dist/embed',
-            publicPath: '/dist/embed',
-            inputs: {
-                widget: 'resources/embed/widget.ts',
-            },
+    },
+    {
+        // IIFE group: self-contained, no shared chunks, works under file://.
+        name: 'embed',
+        format: 'iife',
+        outDir: 'webroot/dist/embed',
+        publicPath: '/dist/embed',
+        inputs: {
+            widget: 'resources/embed/widget.ts',
         },
-    ],
-}),
+    },
+]),
 ```
 
 Logical names for the above: `app/home`, `app/product`, `app/styles`, `embed/widget`.

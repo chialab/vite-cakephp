@@ -59,9 +59,9 @@ export interface ProdManifest {
 /** Discriminated union written to `.vite/php.json` by the plugin. */
 export type PhpManifest = DevManifest | ProdManifest;
 
-export interface VitePhpPluginOptions {
-    /** Project entries (used to write the name→source map into the hot file). */
-    inputs: BuildGroup[];
-}
-
-export declare function vitePhp(options: VitePhpPluginOptions): Plugin;
+/**
+ * Creates a Vite plugin that generates a unified manifest for PHP consumption.
+ * @param inputs Project entries (used to write the name→source map into the hot file).
+ * @returns A Vite plugin that generates a unified manifest for PHP consumption.
+ */
+export declare function vitePhp(inputs: BuildGroup[]): Plugin;

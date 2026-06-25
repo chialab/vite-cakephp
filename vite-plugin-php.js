@@ -1,6 +1,6 @@
 /**
  * @import { Plugin } from 'vite'
- * @import { ManifestEntry, EntryInput, EntrySlots, VitePhpPluginOptions } from './vite';
+ * @import { ManifestEntry, EntryInput, EntrySlots, BuildGroup } from './vite-plugin-php';
  */
 
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -27,18 +27,17 @@ function slotsOf(input) {
  * re-emits their outputs into the host bundle, and writes the unified manifest
  * to `.vite/php.json` with `mode: "production"`. In dev mode it writes the
  * same file with `mode: "development"` plus origin/base/inputs, and removes it on exit.
- * @param {VitePhpPluginOptions} options
+ * @param {BuildGroup[]} inputs Project entries (used to write the name→source map into the hot file).
  * @returns {Plugin}
  */
-export function vitePhp(options) {
-    const groups = options.inputs;
+export function vitePhp(inputs) {
     /**
      * @type {Record<string, EntrySlots>}
      */
-    const inputs = {};
-    for (const group of groups) {
+    const mappedInputs = {};
+    for (const group of inputs) {
         for (const [local, input] of Object.entries(group.inputs)) {
-            inputs[`${group.name}/${local}`] = slotsOf(input);
+            mappedInputs[`${group.name}/${local}`] = slotsOf(input);
         }
     }
 
@@ -84,7 +83,7 @@ export function vitePhp(options) {
                             mode: 'development',
                             origin: url.origin,
                             base: url.pathname,
-                            inputs,
+                            inputs: mappedInputs,
                         },
                         null,
                         2
@@ -129,8 +128,8 @@ export function vitePhp(options) {
 
             const outDir = userConfig.build?.outDir ?? 'dist';
             const defaultFormat = userConfig.build?.lib?.formats?.[0] ?? 'es';
-            const esm = groups.filter((g) => g.format === 'es' || (g.format == null && defaultFormat === 'es'));
-            const iife = groups.filter((g) => g.format === 'iife' || (g.format == null && defaultFormat === 'iife'));
+            const esm = inputs.filter((g) => g.format === 'es' || (g.format == null && defaultFormat === 'es'));
+            const iife = inputs.filter((g) => g.format === 'iife' || (g.format == null && defaultFormat === 'iife'));
 
             /**
              * Unified manifest, keyed by `<group>/<local>`.
