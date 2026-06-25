@@ -148,14 +148,28 @@ export function vitePhp(inputs) {
                 const format = group.format ?? defaultFormat;
                 /** @type {Record<string, string>[]} */
                 const inputs = [];
-                for (const [local, raw] of Object.entries(group.inputs)) {
-                    const slots = slotsOf(raw);
-                    if (slots.js) {
-                        inputs.push({ [local]: slots.js });
+                if (format === 'iife') {
+                    for (const [local, raw] of Object.entries(group.inputs)) {
+                        const slots = slotsOf(raw);
+                        if (slots.js) {
+                            inputs.push({ [local]: slots.js });
+                        }
+                        if (slots.css) {
+                            inputs.push({ [`${local}.css`]: slots.css });
+                        }
                     }
-                    if (slots.css) {
-                        inputs.push({ [`${local}.css`]: slots.css });
+                } else {
+                    const input = {};
+                    for (const [local, raw] of Object.entries(group.inputs)) {
+                        const slots = slotsOf(raw);
+                        if (slots.js) {
+                            input[local] = slots.js;
+                        }
+                        if (slots.css) {
+                            input[`${local}.css`] = slots.css;
+                        }
                     }
+                    inputs.push(input);
                 }
 
                 // Public URL prefix for this group's assets.
@@ -199,7 +213,12 @@ export function vitePhp(inputs) {
                             },
                         },
                     });
-                    buildConfig.build.lib.formats = [Object.keys(input)[0].endsWith('.css') ? 'es' : format];
+                    if (format === 'iife' && Object.keys(input)[0].endsWith('.css')) {
+                        // Force CSS-only entries to be emitted as ES modules, so that Vite outputs them correctly.
+                        buildConfig.build.lib.formats = ['es'];
+                    } else {
+                        buildConfig.build.lib.formats = [format];
+                    }
                     buildConfig.plugins = userConfig.plugins.filter((p) => p.name !== 'vite-plugin-php');
 
                     const output = await build(buildConfig);
