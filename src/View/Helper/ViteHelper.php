@@ -58,16 +58,17 @@ class ViteHelper extends Helper
      * the CSS comes from the JS entry's imports, so nothing is emitted here.
      *
      * @param string $entry The logical name of the entry (e.g. "home").
+     * @param array $options Additional options for the HtmlHelper methods.
      * @return string The HTML tags for the entry's stylesheets.
      */
-    public function css(string $entry): string
+    public function css(string $entry, array $options = []): string
     {
         $mode = $this->mode();
         if ($mode === 'development') {
-            return $this->devCss($entry);
+            return $this->devCss($entry, $options);
         }
         if ($mode === 'production') {
-            return $this->prodCss($entry);
+            return $this->prodCss($entry, $options);
         }
 
         if (Configure::read('debug')) {
@@ -84,17 +85,18 @@ class ViteHelper extends Helper
      * optional modulepreload in prod for ESM entries).
      *
      * @param string $entry The logical name of the entry (e.g. "home").
+     * @param array $options Additional options for the HtmlHelper methods.
      * @return string The HTML tags for the entry's scripts.
      */
-    public function js(string $entry): string
+    public function js(string $entry, array $options = []): string
     {
         $mode = $this->mode();
 
         if ($mode === 'development') {
-            return $this->devJs($entry);
+            return $this->devJs($entry, $options);
         }
         if ($mode === 'production') {
-            return $this->prodJs($entry);
+            return $this->prodJs($entry, $options);
         }
 
         if (Configure::read('debug')) {
@@ -145,10 +147,11 @@ class ViteHelper extends Helper
      * In dev, emit the <script> tags for an entry.
      *
      * @param string $entry The logical name of the entry (e.g. "home").
+     * @param array $options Array of options and HTML attributes.
      * @return string The @vite/client module script followed by the entry module script,
      *               or an empty string for CSS-only entries.
      */
-    protected function devJs(string $entry): string
+    protected function devJs(string $entry, array $options = []): string
     {
         $slots = $this->devSlots($entry);
         $js = $slots['js'] ?? null;
@@ -160,7 +163,7 @@ class ViteHelper extends Helper
         return $this->devClient()
             . (string)$this->Html->script(
                 $this->devUrl((string)$js),
-                ['type' => 'module', 'once' => false]
+                array_merge(['type' => 'module', 'once' => false], $options)
             );
     }
 
@@ -171,10 +174,11 @@ class ViteHelper extends Helper
      * <script type="module">, not a <link>.
      *
      * @param string $entry The logical name of the entry (e.g. "home").
+     * @param array $options Array of options and HTML attributes.
      * @return string The @vite/client script followed by the CSS module script,
      *               or an empty string when CSS is handled by the JS entry's imports.
      */
-    protected function devCss(string $entry): string
+    protected function devCss(string $entry, array $options = []): string
     {
         $slots = $this->devSlots($entry);
         $css = $slots['css'] ?? null;
@@ -187,7 +191,7 @@ class ViteHelper extends Helper
         return $this->devClient()
             . (string)$this->Html->script(
                 $this->devUrl((string)$css),
-                ['type' => 'module', 'once' => false]
+                array_merge(['type' => 'module', 'once' => false], $options)
             );
     }
 
@@ -211,9 +215,10 @@ class ViteHelper extends Helper
      * In prod, emit the <link rel="stylesheet"> tags for an entry's CSS files from the manifest.
      *
      * @param string $entry The logical name of the entry (e.g. "home").
+     * @param array $options Array of options and HTML attributes.
      * @return string The HTML stylesheet tags for the entry, or an empty string if the entry is unknown.
      */
-    protected function prodCss(string $entry): string
+    protected function prodCss(string $entry, array $options = []): string
     {
         $item = $this->manifest()['inputs'][$entry] ?? null;
         if ($item === null) {
@@ -224,7 +229,7 @@ class ViteHelper extends Helper
         $out = '';
         foreach (($item['css'] ?? []) as $file) {
             // rel defaults to "stylesheet".
-            $out .= (string)$this->Html->css($this->asset((string)$file));
+            $out .= (string)$this->Html->css($this->asset((string)$file), $options);
         }
 
         return $out;
@@ -237,9 +242,10 @@ class ViteHelper extends Helper
      * For IIFE entries emits a classic <script> tag.
      *
      * @param string $entry The logical name of the entry (e.g. "home").
+     * @param array $options Array of options and HTML attributes.
      * @return string The HTML script tags for the entry, or an empty string if the entry is unknown or CSS-only.
      */
-    protected function prodJs(string $entry): string
+    protected function prodJs(string $entry, array $options = []): string
     {
         $item = $this->manifest()['inputs'][$entry] ?? null;
         if ($item === null) {
@@ -260,18 +266,18 @@ class ViteHelper extends Helper
                 // css() with a custom rel produces the <link rel="modulepreload">.
                 $out .= (string)$this->Html->css(
                     $this->asset((string)$imp),
-                    ['rel' => 'modulepreload']
+                    array_merge(['rel' => 'modulepreload'], $options)
                 );
             }
             $out .= (string)$this->Html->script(
                 $this->asset($js),
-                ['type' => 'module', 'once' => false]
+                array_merge(['type' => 'module', 'once' => false], $options)
             );
         } else {
             // IIFE: classic script.
             $out .= (string)$this->Html->script(
                 $this->asset($js),
-                ['once' => false]
+                array_merge(['once' => false], $options)
             );
         }
 
