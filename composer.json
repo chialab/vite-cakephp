@@ -1,0 +1,49 @@
+{
+    "name": "chialab/vite-cakephp",
+    "description": "Vite plugin for CakePHP",
+    "type": "cakephp-plugin",
+    "license": "MIT",
+    "homepage": "https://github.com/chialab/vite-cakephp",
+    "authors": [
+        {
+            "name": "Chialab",
+            "homepage": "https://www.chialab.it/",
+            "email": "dev@chialab.it"
+        }
+    ],
+    "require": {
+        "php": ">=8.3",
+        "ext-json": "*",
+        "cakephp/cakephp": "^4.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.5 || ^9.3",
+        "cakephp/cakephp-codesniffer": "~4.2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Chialab\\Vite\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Chialab\\Vite\\Test\\": "tests/",
+            "Cake\\Test\\": "vendor/cakephp/cakephp/tests/"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@test",
+            "@cs-check"
+        ],
+        "cs-check": "phpcs --colors -p src/ tests/",
+        "cs-fix": "phpcbf --colors -p src/ tests/",
+        "test": "phpunit --colors=always"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "sort-packages": true
+    }
+}
