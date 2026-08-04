@@ -312,5 +312,13 @@ export function vitePhp(inputs) {
 
             return 'export default {}';
         },
+
+        generateBundle(options, bundle) {
+            for (const fileName in bundle) {
+                if (bundle[fileName].facadeModuleId?.endsWith(VIRTUAL_ENTRY_ID)) {
+                    delete bundle[fileName];
+                }
+            }
+        }
     };
 }
