@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Chialab\Vite\View\Helper;
 
 use Cake\View\Helper;
+use function Cake\Core\pluginSplit;
 
 /**
  * Rna compatible helper
@@ -16,12 +17,12 @@ class RnaHelper extends Helper
     /**
      * @inheritDoc
      */
-    public $helpers = ['Html', 'Vite'];
+    public array $helpers = ['Html', 'Vite'];
 
     /**
      * @inheritDoc
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'buildPath' => WWW_ROOT . 'build',
         'entrypointFile' => 'entrypoints.json',
     ];

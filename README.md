@@ -7,7 +7,7 @@ A Vite plugin and CakePHP helper that connect a Vite build to a CakePHP applicat
 | Dependency | Version |
 |------------|---------|
 | PHP        | ≥ 8.3   |
-| CakePHP    | ^4.5    |
+| CakePHP    | ^5.0    |
 | Vite       | ^6.0    |
 
 ## Installation
