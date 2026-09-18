@@ -4,11 +4,11 @@ A Vite plugin and CakePHP helper that connect a Vite build to a CakePHP applicat
 
 ## Requirements
 
-| Dependency | Version |
-|------------|---------|
-| PHP        | ≥ 8.3   |
-| CakePHP    | ^4.5    |
-| Vite       | ^6.0    |
+| Dependency | Version         |
+|------------|-----------------|
+| PHP        | ≥ 8.3           |
+| CakePHP    | ^4.5 || ^5.0    |
+| Vite       | ^6.0            |
 
 ## Installation
 

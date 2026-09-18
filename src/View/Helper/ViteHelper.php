@@ -29,12 +29,12 @@ class ViteHelper extends Helper
     /**
      * @var array<int, string>
      */
-    protected $helpers = ['Html'];
+    protected array $helpers = ['Html'];
 
     /**
      * @var array<string, mixed>
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         // Filesystem path to the build directory. Defaults to WWW_ROOT . 'dist'.
         'buildPath' => null,
         // Public base prepended to the manifest paths. A leading "/" makes

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Chialab\Vite\Test\TestCase\View\Helper;
 
+use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
 use Chialab\Vite\View\Helper\ViteHelper;
@@ -41,5 +42,19 @@ class ViteHelperTest extends TestCase
         unset($this->Vite);
 
         parent::tearDown();
+    }
+
+    /**
+     * Test that no tags are emitted when the manifest is missing.
+     *
+     * @return void
+     */
+    public function testMissingManifest(): void
+    {
+        Configure::write('debug', false);
+        $this->Vite->setConfig(['buildPath' => TMP . 'missing-build'], null, false);
+
+        static::assertSame('', $this->Vite->css('app'));
+        static::assertSame('', $this->Vite->js('app'));
     }
 }
