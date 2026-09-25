@@ -6,6 +6,7 @@ namespace Chialab\Vite\View\Helper;
 use Cake\Core\Configure;
 use Cake\View\Helper;
 use RuntimeException;
+use function Cake\Core\pluginSplit;
 
 /**
  * ViteHelper
@@ -64,6 +65,8 @@ class ViteHelper extends Helper
     public function css(string $entry, array $options = []): string
     {
         $mode = $this->mode();
+        $entry = $this->normalizeEntry($entry);
+
         if ($mode === 'development') {
             return $this->devCss($entry, $options);
         }
@@ -91,6 +94,7 @@ class ViteHelper extends Helper
     public function js(string $entry, array $options = []): string
     {
         $mode = $this->mode();
+        $entry = $this->normalizeEntry($entry);
 
         if ($mode === 'development') {
             return $this->devJs($entry, $options);
@@ -121,6 +125,21 @@ class ViteHelper extends Helper
             $this->devUrl('@vite/client'),
             ['type' => 'module']
         );
+    }
+
+    /**
+     * Converts a logical entry name to the format used in the manifest.
+     *
+     * @param string $entry The logical name of the entry (e.g. "PluginName.entry").
+     * @return string The manifest-compatible entry name (e.g. "PluginName/entry").
+     */
+    protected function normalizeEntry(string $entry): string
+    {
+        [$plugin, $name] = pluginSplit($entry);
+        if ($plugin === null) {
+            return $name;
+        }
+        return $plugin . '/' . $name;
     }
 
     /**
