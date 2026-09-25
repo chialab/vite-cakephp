@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Chialab\Vite\View\Helper;
 
 use Cake\View\Helper;
-use function Cake\Core\pluginSplit;
 
 /**
  * Rna compatible helper
@@ -66,11 +65,6 @@ class RnaHelper extends Helper
      */
     public function css(string $asset, array $options = []): string
     {
-        [$group, $asset] = pluginSplit($asset);
-        if ($group !== null) {
-            return $this->Vite->css($group . '/' . $asset, $options);
-        }
-
         return $this->Vite->css($asset, $options);
     }
 
@@ -83,11 +77,6 @@ class RnaHelper extends Helper
      */
     public function script(string $asset, array $options = []): string
     {
-        [$group, $asset] = pluginSplit($asset);
-        if ($group !== null) {
-            return $this->Vite->js($group . '/' . $asset, $options);
-        }
-
         return $this->Vite->js($asset, $options);
     }
 }
