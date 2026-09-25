@@ -139,6 +139,7 @@ class ViteHelper extends Helper
         if ($plugin === null) {
             return $name;
         }
+
         return $plugin . '/' . $name;
     }
 
