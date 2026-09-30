@@ -16,12 +16,12 @@ class RnaHelper extends Helper
     /**
      * @inheritDoc
      */
-    public array $helpers = ['Html', 'Vite'];
+    protected $helpers = ['Html', 'Vite'];
 
     /**
      * @inheritDoc
      */
-    protected array $_defaultConfig = [
+    protected $_defaultConfig = [
         'buildPath' => WWW_ROOT . 'build',
         'entrypointFile' => 'entrypoints.json',
     ];
