@@ -6,6 +6,7 @@ namespace Chialab\Vite\View\Helper;
 use Cake\Core\Configure;
 use Cake\View\Helper;
 use RuntimeException;
+use function Cake\Core\h;
 use function Cake\Core\pluginSplit;
 
 /**
@@ -284,10 +285,7 @@ class ViteHelper extends Helper
         if ($format === 'es') {
             foreach (($item['imports'] ?? []) as $imp) {
                 // css() with a custom rel produces the <link rel="modulepreload">.
-                $out .= (string)$this->Html->css(
-                    $this->asset((string)$imp),
-                    array_merge(['rel' => 'modulepreload'], $options)
-                );
+                $out .= sprintf('<link rel="modulepreload" href="%s">', h($this->asset((string)$imp)));
             }
             $out .= (string)$this->Html->script(
                 $this->asset($js),
