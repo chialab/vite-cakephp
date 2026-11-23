@@ -228,15 +228,17 @@ The plugin writes:
     "inputs": {
         "app/home": {
             "format": "es",
-            "js": "/dist/home-BcD1eF2g.js",
-            "css": ["/dist/home-BcD1eF2g.css"],
-            "imports": ["/dist/vendor-HiJ3kL4m.js"]
+            "js": "/dist/assets/home-BcD1eF2g.js",
+            "css": ["/dist/assets/home-BcD1eF2g.css"],
+            "imports": ["/dist/assets/vendor-HiJ3kL4m.js"]
         }
     }
 }
 ```
 
 `js()` emits `<link rel="modulepreload">` for each import chunk (ESM) followed by `<script type="module">`, or a classic `<script>` for IIFE entries. `css()` emits `<link rel="stylesheet">` for each CSS file.
+
+Each group is built as a regular Vite application build, not in library mode, so the usual `build` options apply: file names follow `build.rolldownOptions.output` (by default hashed, under `assets/`), and assets such as fonts and images are inlined only below `build.assetsInlineLimit`.
 
 ### No manifest
 
