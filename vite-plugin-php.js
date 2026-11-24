@@ -178,6 +178,9 @@ export function vitePhp(inputs) {
                 const publicOf = (file) => `${publicPath}/${file.replace(/^\//, '')}`;
 
                 for (const input of inputs) {
+                    // Force CSS-only entries to be emitted as ES modules, so that Vite outputs them correctly.
+                    const outputFormat = format === 'iife' && Object.keys(input)[0].endsWith('.css') ? 'es' : format;
+                    // Regular (non-lib) build: lib mode always inlines assets, ignoring `build.assetsInlineLimit`.
                     const buildConfig = mergeConfig(userConfig, {
                         configFile: false,
                         base: group.publicPath ?? userConfig.base,
@@ -192,15 +195,16 @@ export function vitePhp(inputs) {
                             write: false,
                             emptyOutDir: false,
                             cssCodeSplit: true,
-                            lib: {
-                                entry: input,
-                                name: format === 'iife' ? group.name : undefined,
-                                inlineDynamicImports: format === 'iife',
-                            },
+                            copyPublicDir: false,
                             rolldownOptions: {
+                                input,
+                                // Keep entry exports, as lib mode did.
+                                preserveEntrySignatures: 'strict',
                                 output: {
-                                    extend: format === 'iife',
-                                    ...(format === 'iife' && {
+                                    format: outputFormat,
+                                    ...(outputFormat === 'iife' && {
+                                        name: group.name,
+                                        extend: true,
                                         intro: [
                                             "var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;",
                                             "var __import_meta_url__ = (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('index.js', document.baseURI).href);",
@@ -213,12 +217,6 @@ export function vitePhp(inputs) {
                             },
                         },
                     });
-                    if (format === 'iife' && Object.keys(input)[0].endsWith('.css')) {
-                        // Force CSS-only entries to be emitted as ES modules, so that Vite outputs them correctly.
-                        buildConfig.build.lib.formats = ['es'];
-                    } else {
-                        buildConfig.build.lib.formats = [format];
-                    }
                     buildConfig.plugins = userConfig.plugins.filter((p) => p.name !== 'vite-plugin-php');
 
                     const output = await build(buildConfig);
